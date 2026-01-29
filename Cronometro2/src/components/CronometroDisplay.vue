@@ -5,12 +5,8 @@
       {{ cronometroStore.tiempoFormateado }}
     </div>
 
-    <!-- Tiempo desde la última marca -->
-    <div
-      v-if="cronometroStore.totalMarcas > 0"
-      class="tiempo-marca-actual"
-    >
-      +{{ tiempoMarcaActual }}
+    <!-- Tiempo de la marca actual (EN VIVO) -->
+    <div class="tiempo-marca-actual"> {{ cronometroStore.tiempoMarcaActualFormateado }}
     </div>
 
     <!-- Estadísticas -->
@@ -39,27 +35,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 import { useCronometroStore } from 'src/stores/cronometro'
 
 const cronometroStore = useCronometroStore()
-
-/**
- * Tiempo transcurrido desde la última marca
- */
-const tiempoMarcaActual = computed(() => {
-  if (cronometroStore.totalMarcas === 0) {
-    return '00:00.00'
-  }
-
-  const ultimaMarca = cronometroStore.marcas[0]
-  const diferencia =
-    cronometroStore.tiempoActual - ultimaMarca.tiempoMarca
-
-  return cronometroStore.formatearTiempo(
-    Math.max(diferencia, 0)
-  )
-})
 </script>
 
 <style scoped>
@@ -85,7 +63,7 @@ const tiempoMarcaActual = computed(() => {
 
 /* Reloj secundario (marca actual) */
 .tiempo-marca-actual {
-  font-size: clamp(1.4rem, 5vw, 1.8rem);
+  font-size: clamp(2.4rem, 5vw, 1.8rem);
   font-weight: 600;
   color: var(--color-azul-claro);
   font-variant-numeric: tabular-nums;
@@ -132,15 +110,5 @@ const tiempoMarcaActual = computed(() => {
   width: 1px;
   height: 12px;
   background: rgba(255, 255, 255, 0.2);
-}
-
-@media (max-width: 360px) {
-  .tiempo-principal {
-    font-size: 3rem;
-  }
-
-  .tiempo-marca-actual {
-    font-size: 1.2rem;
-  }
 }
 </style>

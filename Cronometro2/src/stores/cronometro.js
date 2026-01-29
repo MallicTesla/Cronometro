@@ -15,6 +15,9 @@ export const useCronometroStore = defineStore('cronometro', () => {
   const tiempoInicio = ref(0)
   const tiempoAcumulado = ref(0)
 
+  // 👉 NUEVO: tiempo total cuando se creó la última marca
+  const tiempoUltimaMarca = ref(0)
+
   // ========================================
   // COMPUTED
   // ========================================
@@ -34,6 +37,15 @@ export const useCronometroStore = defineStore('cronometro', () => {
     return formatearTiempo(promedioMarcas.value)
   })
 
+  // 👉 NUEVO: tiempo de la marca actual (EN VIVO)
+  const tiempoMarcaActual = computed(() => {
+    return tiempoTranscurrido.value - tiempoUltimaMarca.value
+  })
+
+  const tiempoMarcaActualFormateado = computed(() => {
+    return formatearTiempo(tiempoMarcaActual.value)
+  })
+
   // ========================================
   // ACCIONES
   // ========================================
@@ -44,8 +56,7 @@ export const useCronometroStore = defineStore('cronometro', () => {
     tiempoInicio.value = Date.now()
 
     idIntervalo.value = setInterval(() => {
-      tiempoTranscurrido.value = tiempoAcumulado.value + (Date.now() - tiempoInicio.value)
-    }, 10)
+      tiempoTranscurrido.value = tiempoAcumulado.value + (Date.now() - tiempoInicio.value)}, 10)
   }
 
   function pausar() {
@@ -66,6 +77,7 @@ export const useCronometroStore = defineStore('cronometro', () => {
     estadoCronometro.value = 'detenido'
     tiempoTranscurrido.value = 0
     tiempoAcumulado.value = 0
+    tiempoUltimaMarca.value = 0
     clearInterval(idIntervalo.value)
     idIntervalo.value = null
     marcas.value = []
@@ -74,21 +86,21 @@ export const useCronometroStore = defineStore('cronometro', () => {
   function guardarMarca() {
     if (estadoCronometro.value !== 'corriendo') return
 
-    const tiempoMarcaActual = tiempoTranscurrido.value
-    const tiempoUltimaMarca = marcas.value.length > 0 ? marcas.value[0].tiempoMarca : 0
-    const intervalo = tiempoMarcaActual - tiempoUltimaMarca
+    const tiempoMarcaActualTotal = tiempoTranscurrido.value
+    const intervalo = tiempoMarcaActualTotal - tiempoUltimaMarca.value
 
     const nuevaMarca = {
       numero: marcas.value.length + 1,
-      tiempoMarca: tiempoMarcaActual,
+      tiempoMarca: tiempoMarcaActualTotal,
       intervalo: intervalo,
       id: Date.now(), // Para key única
     }
 
-    // Agregar al inicio (última marca arriba)
     marcas.value.unshift(nuevaMarca)
 
-    // Guardar en almacenamiento
+    // 👉 CLAVE: reiniciar el reloj de marca
+    tiempoUltimaMarca.value = tiempoMarcaActualTotal
+
     guardarMarcasEnAlmacenamiento()
   }
 
@@ -116,16 +128,12 @@ export const useCronometroStore = defineStore('cronometro', () => {
 
   async function eliminarTodasLasMarcas() {
     marcas.value = []
+    tiempoUltimaMarca.value = 0
     await guardarMarcasEnAlmacenamiento()
   }
 
   async function eliminarMarca(idMarca) {
     marcas.value = marcas.value.filter((marca) => marca.id !== idMarca)
-    // Recalcular números
-    marcas.value = marcas.value.map((marca, index) => ({
-      ...marca,
-      numero: marcas.value.length - index,
-    }))
     await guardarMarcasEnAlmacenamiento()
   }
 
@@ -144,7 +152,6 @@ export const useCronometroStore = defineStore('cronometro', () => {
   // ========================================
   // INICIALIZACIÓN
   // ========================================
-  // Cargar marcas al iniciar
   cargarMarcasDesdeAlmacenamiento()
 
   return {
@@ -158,6 +165,8 @@ export const useCronometroStore = defineStore('cronometro', () => {
     totalMarcas,
     promedioMarcas,
     promedioFormateado,
+    tiempoMarcaActual,
+    tiempoMarcaActualFormateado,
 
     // Acciones
     iniciar,
