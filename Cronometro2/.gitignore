@@ -1,0 +1,97 @@
+# =========================
+# Node / npm
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# =========================
+# Build / Dist
+# =========================
+dist/
+www/
+build/
+
+# =========================
+# Environment variables
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Capacitor
+# =========================
+capacitor.config.json
+capacitor.config.ts
+
+# =========================
+# Android (Capacitor)
+# =========================
+android/.gradle/
+android/.idea/
+android/.classpath
+android/.project
+android/.settings/
+android/build/
+android/app/build/
+android/local.properties
+android/captures/
+android/*.iml
+
+# APK / AAB
+*.apk
+*.aab
+
+# =========================
+# iOS (por si lo agregás después)
+# =========================
+ios/App/Pods/
+ios/App/build/
+ios/App/*.xcworkspace
+ios/App/*.xcodeproj
+ios/App/.idea/
+ios/App/DerivedData/
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# Editor / IDE
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Cache / Temporary
+# =========================
+.cache/
+.tmp/
+.temp/
+
+# =========================
+# Coverage
+# =========================
+coverage/
+
+# =========================
+# Optional lockfiles (elegí uno)
+# =========================
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
